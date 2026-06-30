@@ -19,6 +19,35 @@ function App() {
 
   // TODO [Basic] Inisialisasi layanan deteksi, kamera, dan generator fakta saat aplikasi dimuat
   useEffect(() => {
+    try {
+      if (!document.querySelector('link[rel="manifest"]')) {
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = '/manifest.json';
+        document.head.appendChild(manifestLink);
+      }
+
+      if (!document.querySelector('meta[name="theme-color"]')) {
+        const themeMeta = document.createElement('meta');
+        themeMeta.name = 'theme-color';
+        themeMeta.content = '#10b981';
+        document.head.appendChild(themeMeta);
+      }
+    } catch (e) {
+      console.warn('Gagal menyisipkan manifest/theme-color:', e);
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((registration) => {
+          console.log('[PWA] Service worker terdaftar:', registration.scope);
+        })
+        .catch((err) => {
+          console.warn('[PWA] Gagal mendaftarkan service worker:', err);
+        });
+    }
+
     let isMounted = true;
     async function initServices() {
       actions.setModelStatus('loading');
